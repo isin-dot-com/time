@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>До отбоя: макеты экранов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Martian+Mono:wght@400;500&family=Onest:wght@400;500;600;800&family=Unbounded:wght@300;500;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#dfe2e8; --page-ink:#171b27; --page-dim:#5a6172; --page-line:#c3c8d2; --page-panel:#eef0f4; --page-acc:#3b2f6b;
+  --z:1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--page);color:var(--page-ink);font-family:Onest,system-ui,sans-serif;font-size:16px;line-height:1.45;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--page-acc);outline-offset:2px}
+
+/* ---------- page ---------- */
+.top{padding:40px 24px 8px;max-width:1760px;margin:0 auto}
+.top h1{font-family:Unbounded,sans-serif;font-weight:500;font-size:clamp(34px,6vw,72px);line-height:1;letter-spacing:-.03em}
+.top p{max-width:62ch;margin-top:14px;color:var(--page-dim)}
+.bar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--page) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--page-line)}
+.bar-in{max-width:1760px;margin:0 auto;padding:10px 24px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+.grp{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.grp>span{font-size:13px;color:var(--page-dim);margin-right:4px}
+.grp button{font-size:13px;padding:6px 11px;border-radius:999px;border:1px solid var(--page-line);background:var(--page-panel)}
+.grp button[aria-pressed=true]{background:var(--page-ink);color:var(--page);border-color:var(--page-ink)}
+section{max-width:1760px;margin:0 auto;padding:44px 24px 8px}
+section h2{font-family:Unbounded,sans-serif;font-weight:500;font-size:22px;letter-spacing:-.01em}
+section>p{color:var(--page-dim);max-width:72ch;margin-top:6px;font-size:15px}
+.row{display:flex;flex-wrap:wrap;gap:36px 32px;margin-top:24px;align-items:flex-start}
+figure{width:calc(413px*var(--z))}
+figcaption{font-size:13px;color:var(--page-dim);margin-top:10px;max-width:calc(413px*var(--z))}
+figcaption b{color:var(--page-ink);font-weight:600}
+footer{max-width:1760px;margin:0 auto;padding:48px 24px 64px;color:var(--page-dim);font-size:13px}
+
+/* ---------- phone ---------- */
+.phone{zoom:var(--z);width:413px;border:10px solid #0b0c10;border-radius:58px;background:#0b0c10;overflow:hidden}
+.phone.crop{border-bottom:0;border-radius:58px 58px 0 0}
+.scr{position:relative;width:393px;height:852px;border-radius:48px;overflow:hidden;font-family:Onest,system-ui,sans-serif;font-size:15px;line-height:1.3;color:#fff}
+.crop .scr{border-radius:48px 48px 0 0}
+.status{position:absolute;top:0;left:0;right:0;height:54px;display:flex;justify-content:space-between;align-items:center;padding:6px 34px 0;font-weight:600;font-size:15px;z-index:5}
+.status .sig{display:flex;gap:6px;align-items:center;font-size:13px}
+.batt{width:25px;height:12px;border-radius:4px;background:currentColor;opacity:.9}
+.pill{position:absolute;top:11px;left:50%;transform:translateX(-50%);height:37px;width:126px;border-radius:20px;background:#000;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:0 10px;color:#fff}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:140px;height:5px;border-radius:3px;background:currentColor;opacity:.85;z-index:5}
+
+/* themes: affect card, island accent, home widgets, app */
+body[data-theme=coal]{--c-bg:#1d1c1a;--c-ink:#f3ead9;--c-dim:#a59c8c;--c-acc:#d8c6a4;--c-on:#1d1c1a;--c-track:#3a3733;--c-row:#282623;--c-di:#d8c6a4;--f-num:Unbounded;--w-num:500;--dw:.8em}
+body[data-theme=paper]{--c-bg:#f1eee6;--c-ink:#1b2742;--c-dim:#6c7385;--c-acc:#1b2742;--c-on:#f1eee6;--c-track:#d6d1c4;--c-row:#e6e2d7;--c-di:#ece6d6;--f-num:Fraunces;--w-num:600;--dw:.6em}
+body[data-theme=signal]{--c-bg:#16171b;--c-ink:#ffffff;--c-dim:#9498a3;--c-acc:#ff3b30;--c-on:#fff;--c-track:#32343b;--c-row:#22242a;--c-di:#ff3b30;--f-num:Onest;--w-num:800;--dw:.62em}
+body[data-theme=sunset]{--c-bg:linear-gradient(150deg,#f0a23b 0%,#c9554f 52%,#5b2a5e 100%);--c-ink:#fff7ea;--c-dim:#ffe0c4;--c-acc:#fff7ea;--c-on:#7a2f4e;--c-track:rgba(255,255,255,.28);--c-row:rgba(255,255,255,.16);--c-di:#f0a23b;--f-num:Unbounded;--w-num:300;--dw:.78em}
+body[data-theme=terminal]{--c-bg:#030b05;--c-ink:#3dff7c;--c-dim:#1f9a49;--c-acc:#3dff7c;--c-on:#030b05;--c-track:#0e3a1c;--c-row:#07190c;--c-di:#3dff7c;--f-num:"Martian Mono";--w-num:500;--dw:.66em}
+body[data-theme=neon]{--c-bg:#000;--c-ink:#fff;--c-dim:#8b8f98;--c-acc:#3dffd0;--c-on:#000;--c-track:#23262b;--c-row:#111316;--c-di:#3dffd0;--f-num:Unbounded;--w-num:800;--dw:.82em}
+body[data-theme=terminal] .themed{font-family:"Martian Mono",monospace;letter-spacing:-.04em}
+body[data-theme=terminal] .num{letter-spacing:-.03em}
+body[data-theme=terminal] .num i,body[data-theme=terminal] .num i.c{width:auto}
+
+.num{font-family:var(--f-num),Onest,sans-serif;font-weight:var(--w-num);white-space:nowrap;letter-spacing:0}
+.num i{display:inline-block;width:var(--dw);text-align:center;font-style:normal}
+.num i.c{width:.38em}
+.sysnum i{display:inline-block;width:.6em;text-align:center;font-style:normal}
+.sysnum i.c{width:.3em}
+
+/* ---------- lock screen ---------- */
+.lock{background:
+  radial-gradient(120% 40% at 30% 66%,#2a2331 0 60%,transparent 61%),
+  radial-gradient(90% 34% at 85% 70%,#1f1a26 0 60%,transparent 61%),
+  linear-gradient(180deg,#27365a 0%,#59608a 30%,#b98792 50%,#e7ae84 60%,#3a2c3a 61%,#17141b 100%)}
+.lock.night{background:
+  radial-gradient(120% 40% at 30% 66%,#0d0e16 0 60%,transparent 61%),
+  radial-gradient(90% 34% at 85% 70%,#0a0b12 0 60%,transparent 61%),
+  linear-gradient(180deg,#05070f 0%,#101730 45%,#1c2748 60%,#0a0b12 61%,#050508 100%)}
+.l-date{position:absolute;top:70px;left:0;right:0;text-align:center;font-size:21px;font-weight:600;opacity:.95}
+.l-clock{position:absolute;top:92px;left:0;right:0;text-align:center;font-size:104px;font-weight:600;line-height:1;letter-spacing:-.03em;opacity:.95}
+.l-wid{position:absolute;top:208px;left:22px;right:22px;display:flex;gap:12px;align-items:center}
+.wr{width:172px;height:76px;padding:8px 10px;border-radius:16px;background:rgba(255,255,255,.14);display:flex;flex-direction:column;justify-content:center;gap:3px;color:#fff}
+.wr .a{display:flex;align-items:baseline;gap:6px;font-size:11px;opacity:.85}
+.wr .a b{font-size:22px;font-weight:600;opacity:1}
+.wr .b{font-size:12px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wc{width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,.14);position:relative;display:grid;place-items:center;color:#fff;font-weight:600;font-size:15px}
+.wc svg{position:absolute;inset:0}
+.l-bot{position:absolute;bottom:38px;left:46px;right:46px;display:flex;justify-content:space-between}
+.l-bot span{width:50px;height:50px;border-radius:50%;background:rgba(40,40,46,.6);display:grid;place-items:center}
+.l-bot span::after{content:"";width:18px;height:18px;border-radius:5px;border:2px solid #fff;opacity:.9}
+.l-stack{position:absolute;left:11px;right:11px;bottom:112px;display:flex;flex-direction:column;gap:8px}
+
+/* live activity card: 371 x <=160 */
+.la{width:371px;height:156px;max-height:160px;border-radius:26px;padding:14px 16px 14px;background:var(--c-bg);color:var(--c-ink);display:flex;flex-direction:column;overflow:hidden}
+.la-h{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--c-dim);height:28px}
+.la-h b{color:var(--c-ink);font-weight:600}
+.la-more{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--c-dim);display:grid;place-items:center;color:var(--c-ink)}
+.la-more svg{width:14px;height:14px}
+.la .num{font-size:40px;line-height:46px;margin-left:-2px}
+.la-p{font-size:14px;line-height:18px;height:36px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:2px}
+.dl{position:relative;height:5px;border-radius:3px;background:var(--c-track);margin-top:auto}
+.dl s{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--c-acc)}
+.dl u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--c-bg);opacity:.9}
+body[data-theme=sunset] .dl u{background:#a8475a}
+body[data-theme=signal] .la.last .num{color:var(--c-acc)}
+.la.closed .num{font-size:30px}
+
+/* notification */
+.nt{font-family:Onest,system-ui,sans-serif !important;letter-spacing:0 !important;max-width:100%;box-sizing:border-box;width:371px;border-radius:24px;padding:12px 14px;background:rgba(245,245,247,.82);color:#111;display:flex;gap:10px;backdrop-filter:blur(12px)}
+.nt .ic,.ic{flex:none;width:38px;height:38px;border-radius:9px;background:#15161b;display:grid;place-items:center}
+.nt b{display:block;font-size:15px}
+.nt span{font-size:15px;line-height:1.25}
+.nt em{margin-left:auto;font-style:normal;font-size:13px;color:#555;flex:none}
+
+/* dynamic island */
+.pill.compact{width:236px}
+.pill .t{font-size:15px;font-weight:600;color:var(--c-di)}
+.dot{position:absolute;top:11px;left:calc(50% + 126px);width:37px;height:37px;border-radius:50%;background:#000;z-index:6;display:grid;place-items:center}
+.pill.other{width:170px;transform:translateX(-62%)}
+.pill.other::before{content:"";width:18px;height:18px;border-radius:5px;background:#35c759}
+.di-x{position:absolute;top:11px;left:11px;width:371px;height:150px;border-radius:44px;background:#000;z-index:7;padding:20px 22px 18px;display:flex;flex-direction:column;color:#fff}
+.di-x .h{display:flex;justify-content:space-between;font-size:13px;color:#9a9aa2}
+.di-x .num{font-size:34px;line-height:42px;color:#fff}
+.di-x .p{font-size:14px;line-height:18px;color:#e6e6ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.di-x .dl{background:#2a2a2e}.di-x .dl s{background:var(--c-di)}.di-x .dl u{background:#000}
+
+/* home screen */
+.home{background:linear-gradient(160deg,#2c3a63,#7a6c93 55%,#d89c84)}
+.h-grid{position:absolute;top:74px;left:14px;right:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:20px 24px}
+.hw{border-radius:24px;background:var(--c-bg);color:var(--c-ink);padding:16px;display:flex;flex-direction:column;height:170px;overflow:hidden}
+.hw.s{width:170px}.hw.m{grid-column:1/3}
+.hw small{font-size:12px;color:var(--c-dim)}
+.hw.s .num{font-size:30px;line-height:40px;margin-top:6px}
+.hw.m .num{font-size:44px;line-height:52px}
+.hw p{font-size:14px;line-height:18px;margin-top:auto;margin-bottom:10px}
+.hw.s p{font-size:13px;line-height:16px}
+.h-ic{display:grid;grid-template-columns:repeat(2,60px);gap:20px 22px;align-content:start;justify-content:center;padding-top:6px}
+.h-ic span{width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.22)}
+
+/* ---------- app + onboarding (themed) ---------- */
+.app{background:var(--c-bg);color:var(--c-ink)}
+.app .status,.app .homebar{color:var(--c-ink)}
+.a-body{position:absolute;top:60px;left:0;right:0;bottom:92px;padding:6px 22px 0;overflow:hidden;display:flex;flex-direction:column}
+.a-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.a-h h3{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.gear{width:34px;height:34px;border-radius:50%;background:var(--c-row);display:grid;place-items:center}
+.gear::after{content:"";width:14px;height:14px;border-radius:50%;border:3px dotted var(--c-ink)}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:86px;padding:10px 12px 0;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--c-track);font-size:11px;text-align:center;color:var(--c-dim)}
+.tabs span::before{content:"";display:block;width:22px;height:22px;margin:0 auto 4px;border-radius:7px;border:2px solid currentColor}
+.tabs .on{color:var(--c-ink);font-weight:600}
+.tabs .on::before{background:var(--c-acc);border-color:var(--c-acc)}
+.big{font-size:54px;line-height:62px;margin:10px 0 0 -3px}
+.sub{font-size:13px;color:var(--c-dim)}
+.say{font-size:19px;line-height:25px;margin:10px 0 18px;min-height:50px}
+.dl.tall{height:10px;border-radius:5px;margin:0 0 6px}
+.dl.tall s{border-radius:5px}
+.dl i{position:absolute;top:-5px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--c-ink);border:4px solid var(--c-row)}
+.dl-lab{display:flex;font-size:12px;color:var(--c-dim);margin-bottom:16px}
+.cta{display:block;width:100%;height:52px;border-radius:16px;background:var(--c-acc);color:var(--c-on);font-weight:600;font-size:17px;text-align:center;line-height:52px}
+.cta.ghost{background:none;color:var(--c-ink);border:1.5px solid var(--c-track)}
+.list{border-radius:16px;background:var(--c-row);margin-top:14px}
+.list>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;font-size:15px;border-top:1px solid var(--c-track)}
+.list>div:first-child{border-top:0}
+.list em{font-style:normal;color:var(--c-dim);font-size:14px;text-align:right;flex:none}
+.cap{font-size:13px;color:var(--c-dim);margin:18px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips span{padding:8px 13px;border-radius:999px;background:var(--c-row);font-size:14px}
+.chips .on{background:var(--c-acc);color:var(--c-on);font-weight:600}
+.lockd{font-size:11px;padding:2px 7px;border-radius:999px;border:1px solid var(--c-dim);color:var(--c-dim)}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.sw div{font-size:12px;text-align:center;color:var(--c-dim)}
+.sw div::before{content:"";display:block;height:44px;border-radius:12px;margin-bottom:5px;background:var(--s);border:1.5px solid var(--c-track)}
+.sw .on{color:var(--c-ink);font-weight:600}.sw .on::before{outline:2.5px solid var(--c-acc);outline-offset:2px}
+.tog{width:46px;height:28px;border-radius:14px;background:var(--c-track);position:relative;flex:none}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--c-ink)}
+.mini{zoom:.86;margin:0 -4px 0 -4px}
+.mini .la{box-shadow:0 0 0 1px var(--c-track)}
+
+.ob{position:absolute;top:70px;left:0;right:0;bottom:34px;padding:0 26px;display:flex;flex-direction:column}
+.steps{display:flex;gap:5px;margin-bottom:26px}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--c-track)}
+.steps i.on{background:var(--c-acc)}
+.ob h3{font-size:30px;line-height:34px;font-weight:800;letter-spacing:-.02em}
+.ob .lead{font-size:16px;line-height:22px;color:var(--c-dim);margin-top:12px}
+.opts{margin-top:24px;display:flex;flex-direction:column;gap:10px}
+.opts div{padding:15px 16px;border-radius:16px;background:var(--c-row);font-size:17px}
+.opts div small{display:block;font-size:13px;color:var(--c-dim);margin-top:3px}
+.opts .on{box-shadow:inset 0 0 0 2px var(--c-acc)}
+.times{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.times div{padding:16px;border-radius:16px;background:var(--c-row)}
+.times .num{font-size:30px;display:block;margin-top:4px}
+.ob .end{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.skip{text-align:center;font-size:14px;color:var(--c-dim);padding:8px}
+.how{margin-top:22px;display:flex;flex-direction:column;gap:14px;font-size:16px}
+.how div{display:flex;gap:12px}
+.how b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--c-row);display:grid;place-items:center;font-size:13px}
+@media (prefers-reduced-motion:no-preference){.grp button{transition:background .15s,color .15s}}
+@media (max-width:600px){.bar{position:static}.top{padding:28px 16px 8px}.bar-in,section,footer{padding-left:16px;padding-right:16px}.row{gap:28px}}
+</style>
+</head>
+<body data-theme="coal">
+<header class="top">
+  <h1 id="ttl"></h1>
+  <p id="lead"></p>
+</header>
+<div class="bar"><div class="bar-in" id="bar"></div></div>
+<main id="main"></main>
+<footer id="foot"></footer>
+
+<script>
+const S={lang:'ru',theme:'coal',tone:'calm'};
+const THEMES=[['coal','Уголь','Coal'],['paper','Бумага','Paper'],['signal','Сигнал','Signal'],['sunset','Закат','Sunset'],['terminal','Терминал','Terminal'],['neon','Неон','Neon']];
+const SW={coal:'#1d1c1a',paper:'#f1eee6',signal:'linear-gradient(135deg,#16171b 60%,#ff3b30 60%)',sunset:'linear-gradient(150deg,#f0a23b,#c9554f 52%,#5b2a5e)',terminal:'linear-gradient(135deg,#030b05 60%,#3dff7c 60%)',neon:'linear-gradient(135deg,#000 60%,#3dffd0 60%)'};
+const TONES=['calm','kind','hard','irony'];
+const L={
+ru:{
+ ttl:'До отбоя',lead:'Макеты первой версии. Название рабочее, тексты и цвета не финальные. Размеры окна и виджетов на экране блокировки соблюдены по ограничениям iOS, чтобы макет не обещал невозможного.',
+ gLang:'Язык',gTheme:'Тема',gTone:'Тон',
+ tone:{calm:'Спокойно',kind:'По-доброму',hard:'Жёстко',irony:'С иронией'},
+ ph:{calm:{m:'День длинный. Начни с одного дела.',d:'Половина дня ещё здесь. Выбери главное.',e:'Вечер твой. Закрой то, что начал.',l:'Час. Хватит, чтобы закончить одно.'},
+     kind:{m:'У тебя впереди целый день. Он твой.',d:'Середина дня. Ты идёшь нормально.',e:'Вечер. Сделай одно для себя.',l:'Ты сегодня уже много сделал. Остался час.'},
+     hard:{m:'15 часов. Потом их не будет.',d:'Полдня ушло. Вторую половину не отдавай.',e:'Вечер не для ленты. Доделай начатое.',l:'Час. Телефон подождёт.'},
+     irony:{m:'Лента никуда не денется. День — денется.',d:'Обед был. Отговорки тоже. Дальше дело.',e:'Вечер. Сериал подождёт ещё серию.',l:'Последний час. Самое время начать, да?'}},
+ until:'До отбоя',untilWake:'До подъёма',seg:{m:'Утро',d:'День',l:'Вечер'},closed:'День закрыт',closedSub:'Завтра в 8:00 начнётся новый.',rest:'Отдыхай',
+ date:'Пт 13 нояб.',more:'Другая фраза',now:'сейчас',h:'ч',min:'мин',
+ s1:['Экран блокировки','Главная поверхность: окно отсчёта. Оно не выше 160 pt и шириной 371 pt. Внутри одна маленькая кнопка «другая фраза». Первый экран считает до 23:00 по часам вашего устройства; ночью показывает демонстрационное значение.'],
+ c1:['<b>Сейчас.</b> Живой отсчёт до отбоя.','<b>Утро.</b> Первое окно дня, только что появилось.','<b>День.</b> Второй отрезок, новая фраза.','<b>Последний час.</b> Фраза меняется на финальную; в теме «Сигнал» цифры краснеют.','<b>День закрыт.</b> Спокойное завершение, окно исчезает через 15 минут.'],
+ s2:['Dynamic Island','Появляется вместе с окном. Фон всегда чёрный, тема влияет только на акцент.'],
+ c2:['<b>Свёрнутый.</b> Кольцо остатка дня и время.','<b>Минимальный.</b> Когда остров делят два приложения, остаётся кольцо.','<b>Развёрнутый.</b> По долгому нажатию.'],
+ s3:['Виджеты экрана блокировки','Работают круглые сутки и не требуют запуска. Прямоугольный не больше 172×76 pt, круглый 76 pt. Они всегда одноцветные: так их рисует iOS, тема на них не влияет.'],
+ c3:['<b>Днём.</b> Строка над часами, прямоугольный и круглый виджеты.','<b>Ночью.</b> Время до подъёма и нейтральное слово, без призывов.'],
+ s4:['Оповещение о начале отрезка','Когда окно запускается по расписанию, iOS обязательно показывает оповещение. В нём фраза отрезка. Не больше трёх в день.'],
+ c4:['<b>Начало утра.</b> Оповещение и окно под ним.'],
+ ntT:'Утро. До отбоя 15 часов',
+ s5:['Первый запуск','Приветствие, пять вопросов, выбор вида и два служебных шага. Около минуты. Любой вопрос можно пропустить.'],
+ c5:['Приветствие','Вопрос 1. Границы дня','Вопрос 2. Главное','Вопрос 3. Тон (выбранный меняется переключателем сверху)','Вопрос 4. Что съедает день','Вопрос 5. Сколько слов','Выбор вида','Разрешение на оповещения','Как добавить виджет','Старт'],
+ wH:'Сколько сегодня осталось',wP:'Отсчёт до твоего отбоя прямо на экране блокировки. И пара слов, чтобы остаток дня достался важному.',wB:'Настроить за минуту',
+ next:'Дальше',skip:'Пропустить',
+ q1:'Когда начинается и заканчивается твой день?',wake:'Подъём',bed:'Отбой',q1n:'Отбой может быть и после полуночи.',
+ q2:'На что сегодня важнее всего успевать?',q2o:['работа','учёба','своё дело','здоровье','близкие','своё слово'],
+ q3:'Как с тобой говорить?',
+ q4:'Что чаще всего съедает день?',q4o:['телефон и ленты','откладывание','чужие задачи','усталость','хаос'],
+ q5:'Сколько слов нужно?',q5o:[['только цифры','Без фраз, только отсчёт'],['немного','Одна фраза на отрезок'],['на каждый отрезок и последний час','До шести фраз за день']],
+ vH:'Как это будет выглядеть',vP:'Тему и формат можно поменять в любой момент.',
+ fmt:'Формат',fmtO:['12:48:33','12:48','12 ч 48 мин','53%'],dots:'Точки',
+ nH:'До трёх оповещений в день',nP:'В начале каждого отрезка придёт одно оповещение с фразой, и на экране блокировки появится окно отсчёта. Звук выберешь сам, можно самый тихий.',nB:'Разрешить оповещения',later:'Позже',
+ aH:'Добавь виджет на экран блокировки',aP:'Он показывает отсчёт всегда, даже когда окна нет.',aS:['Нажми и удерживай экран блокировки','Выбери «Настроить», затем экран блокировки','Нажми на область под часами и выбери «До отбоя»'],aB:'Готово',
+ gH:'Всё готово',gP:'Нажми «Начать день» и заблокируй телефон. Отсчёт уже будет на экране.',start:'Начать день',auto:'Запускать каждый день автоматически',
+ s6:['Приложение','Четыре вкладки и настройки. Открывают его редко, поэтому «Сегодня» показывает то же, что экран блокировки.'],
+ c6:['Сегодня','Слова','Вид','День','Настройки'],
+ tab:['Сегодня','Слова','Вид','День'],
+ stop:'Остановить на сегодня',st:[['Окно на экране блокировки','включено'],['Виджет','добавлен'],['Следующий отрезок','']],
+ wTone:'Тон',wMain:'Главное',wCount:'Сколько слов',wLast:'Последние фразы',hide:'скрыть',own:'Свои фразы',prem:'премиум',
+ vTheme:'Тема',vSound:'Звук оповещения',vSoundV:'Тихий',
+ dSeg:'Отрезки',dSegN:'Границы можно сдвинуть на линии.',dOff:'Не сегодня',dOffN:'Выключить отсчёт до завтра',
+ set:'Настройки',setO:[['Язык','Как в системе'],['Как добавить виджет',''],['Кнопка в Пункте управления',''],['Автоматизация «Команд»',''],['Пройти анкету заново',''],['Политика конфиденциальности','']],
+ s7:['Премиум','Продаж в первой версии нет. Точки входа уже расставлены и ведут на эту заглушку.'],c7:['Заглушка «скоро»'],
+ pH:'Премиум появится позже',pP:'Отсчёт, окно, виджеты, три темы и четыре тона останутся бесплатными всегда.',pL:['Дополнительные темы и форматы','Свои фразы','Отсчёты до недели, года и дедлайна','Отдельные границы дня для выходных','Приложение для Apple Watch'],ok:'Понятно',
+ s8:['Виджет домашнего экрана','Цветной, в выбранной теме. Малый и средний размер.'],c8:['Малый и средний виджеты'],
+ foot:'Обои нарисованы градиентом. Шрифты цифр и точные цвета тем уточняются на реальном устройстве.'
+},
+en:{
+ ttl:"Day's End",lead:'First-version mockups. The name is a working title; copy and colours are not final. Lock Screen window and widget sizes follow iOS limits, so the mockup promises nothing the system forbids.',
+ gLang:'Language',gTheme:'Theme',gTone:'Tone',
+ tone:{calm:'Calm',kind:'Kind',hard:'Blunt',irony:'Wry'},
+ ph:{calm:{m:'Long day ahead. Start with one thing.',d:'Half the day is still here. Pick what matters.',e:'Evening is yours. Close what you opened.',l:'One hour. Enough to finish one thing.'},
+     kind:{m:'A whole day is yours. No rush, just begin.',d:"Midday. You're doing fine, keep going.",e:'Evening. Do one thing just for you.',l:'You did a lot today. One hour to go.'},
+     hard:{m:"15 hours. Then they're gone.",d:'Half is spent. Guard the rest.',e:"Evening isn't for the feed. Finish it.",l:'One hour. The phone can wait.'},
+     irony:{m:"The feed will still be there. The day won't.",d:'Lunch is over. So are the excuses.',e:'Evening. The show can wait one more episode.',l:'Last hour. Great time to start, right?'}},
+ until:'Until bedtime',untilWake:'Until wake-up',seg:{m:'Morning',d:'Day',l:'Evening'},closed:'Day closed',closedSub:'A new one starts at 8:00.',rest:'Rest',
+ date:'Fri 13 Nov',more:'Another phrase',now:'now',h:'h',min:'min',
+ s1:['Lock Screen','The main surface: the countdown window. It is at most 160 pt tall and 371 pt wide, with one small "another phrase" button. The first screen counts to 23:00 on your device clock; at night it shows a demo value.'],
+ c1:['<b>Now.</b> Live countdown to bedtime.','<b>Morning.</b> The first window of the day, just appeared.','<b>Day.</b> Second stretch, new phrase.','<b>Last hour.</b> The phrase switches to the closing one; in Signal the digits turn red.','<b>Day closed.</b> A calm ending; the window leaves after 15 minutes.'],
+ s2:['Dynamic Island','Appears together with the window. Always black; the theme only changes the accent.'],
+ c2:['<b>Compact.</b> A ring for what is left, and the time.','<b>Minimal.</b> When two apps share the island, only the ring stays.','<b>Expanded.</b> On long press.'],
+ s3:['Lock Screen widgets','They work around the clock and need no start. Rectangular is at most 172×76 pt, circular 76 pt. Always single-colour: iOS draws them that way, themes do not apply.'],
+ c3:['<b>Daytime.</b> Line above the clock, rectangular and circular widgets.','<b>Night.</b> Time until wake-up and a neutral word, no nudging.'],
+ s4:['Stretch start alert','When a window starts on schedule, iOS always shows an alert. It carries the phrase for that stretch. Three a day at most.'],
+ c4:['<b>Morning starts.</b> The alert with the window below it.'],
+ ntT:'Morning. 15 hours until bedtime',
+ s5:['First launch','A welcome, five questions, a look picker and two service steps. About a minute. Any question can be skipped.'],
+ c5:['Welcome','Question 1. Day bounds','Question 2. What matters','Question 3. Tone (the selected one follows the switch above)','Question 4. What eats the day','Question 5. How many words','Pick a look','Alert permission','How to add the widget','Start'],
+ wH:'How much of today is left',wP:'A countdown to your bedtime, right on the Lock Screen. And a few words so the rest of the day goes to what matters.',wB:'Set up in a minute',
+ next:'Next',skip:'Skip',
+ q1:'When does your day start and end?',wake:'Wake-up',bed:'Bedtime',q1n:'Bedtime can be after midnight.',
+ q2:'What matters most to fit in today?',q2o:['work','study','my own thing','health','people I love','my own word'],
+ q3:'How should we talk to you?',
+ q4:'What eats your day most often?',q4o:['phone and feeds','putting things off',"other people's tasks",'tiredness','chaos'],
+ q5:'How many words do you need?',q5o:[['digits only','No phrases, just the countdown'],['a few','One phrase per stretch'],['every stretch and the last hour','Up to six phrases a day']],
+ vH:'How it will look',vP:'You can change theme and format any time.',
+ fmt:'Format',fmtO:['12:48:33','12:48','12 h 48 min','53%'],dots:'Dots',
+ nH:'Up to three alerts a day',nP:'At the start of each stretch you get one alert with a phrase, and the countdown window appears on the Lock Screen. You pick the sound, including the quietest one.',nB:'Allow alerts',later:'Later',
+ aH:'Add the widget to your Lock Screen',aP:'It shows the countdown always, even when there is no window.',aS:['Touch and hold the Lock Screen','Tap Customize, then Lock Screen','Tap the area below the clock and pick "Day\'s End"'],aB:'Done',
+ gH:'All set',gP:'Tap "Start the day" and lock your phone. The countdown will already be there.',start:'Start the day',auto:'Start every day automatically',
+ s6:['The app','Four tabs and settings. It is opened rarely, so Today shows what the Lock Screen shows.'],
+ c6:['Today','Words','Look','Day','Settings'],
+ tab:['Today','Words','Look','Day'],
+ stop:'Stop for today',st:[['Lock Screen window','on'],['Widget','added'],['Next stretch','']],
+ wTone:'Tone',wMain:'What matters',wCount:'How many words',wLast:'Recent phrases',hide:'hide',own:'My own phrases',prem:'premium',
+ vTheme:'Theme',vSound:'Alert sound',vSoundV:'Quiet',
+ dSeg:'Stretches',dSegN:'Drag the bounds on the line.',dOff:'Not today',dOffN:'Turn the countdown off until tomorrow',
+ set:'Settings',setO:[['Language','Same as system'],['How to add the widget',''],['Control Center button',''],['Shortcuts automation',''],['Retake the questions',''],['Privacy policy','']],
+ s7:['Premium','Nothing is sold in the first version. Entry points are already in place and lead to this placeholder.'],c7:['"Soon" placeholder'],
+ pH:'Premium comes later',pP:'The countdown, the window, widgets, three themes and four tones stay free for good.',pL:['More themes and formats','Your own phrases','Countdowns to the week, the year and a deadline','Separate day bounds for weekends','An Apple Watch app'],ok:'Got it',
+ s8:['Home Screen widget','In colour, in the chosen theme. Small and medium sizes.'],c8:['Small and medium widgets'],
+ foot:'Wallpapers are drawn with gradients. Digit typefaces and exact theme colours are to be tuned on a real device.'
+}};
+const t=()=>L[S.lang];
+const P=m=>t().ph[S.tone][m==='x'?'l':m];
+function liveM(){const h=new Date().getHours();return h<8||h>=23?'d':h<12?'m':h<18?'d':h<22?'e':'x'}
+const segOf=m=>t().seg[m==='x'||m==='e'?'l':m];
+
+/* ---------- time ---------- */
+const T0=Date.now(), DAY=15*3600, DEMO={live:12*3600+48*60+33,m:14*3600+58*60+7,d:8*3600+26*60+41,l:47*60+12,w:6*3600+42*60+10};
+function secs(k){
+  const el=Math.floor((Date.now()-T0)/1000);
+  if(k==='live'){const n=new Date(),h=n.getHours();
+    if(h>=8&&h<23){const b=new Date(n);b.setHours(23,0,0,0);return Math.floor((b-n)/1000)}
+    return Math.max(0,DEMO.live-el)}
+  return Math.max(0,DEMO[k]-el);
+}
+const p2=n=>String(n).padStart(2,'0');
+function fmt(s,f){const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
+  const str=f==='hm'?h+':'+p2(m):h+':'+p2(m)+':'+p2(x);
+  return [...str].map(c=>c===':'?'<i class="c">:</i>':'<i>'+c+'</i>').join('')}
+const pct=k=>Math.min(100,Math.max(0,(1-secs(k)/DAY)*100));
+function tick(){
+  document.querySelectorAll('[data-t]').forEach(e=>{e.innerHTML=fmt(secs(e.dataset.t),e.dataset.f)});
+  document.querySelectorAll('[data-p]').forEach(e=>{e.style.width=pct(e.dataset.p)+'%'});
+  document.querySelectorAll('[data-ring]').forEach(e=>{e.setAttribute('stroke-dashoffset',(100-(100-pct(e.dataset.ring))).toFixed(1))});
+  const n=new Date();document.querySelectorAll('[data-clock]').forEach(e=>{e.textContent=n.getHours()+':'+p2(n.getMinutes())});
+}
+
+/* ---------- pieces ---------- */
+const num=(k,f,cls='')=>`<span class="num ${cls}" data-t="${k}" data-f="${f||'hms'}"></span>`;
+const sys=(k,f)=>`<span class="sysnum" data-t="${k}" data-f="${f||'hm'}"></span>`;
+const ring=(k,sz,sw,col)=>`<svg width="${sz}" height="${sz}" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="${sw}"/><circle cx="18" cy="18" r="15.9" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" pathLength="100" stroke-dasharray="100" data-ring="${k}" transform="rotate(-90 18 18)"/></svg>`;
+const dline=(k,cls='',hand='')=>`<div class="dl ${cls}"><s data-p="${k}"></s><u style="left:26.7%"></u><u style="left:66.7%"></u>${hand}</div>`;
+const icon=`<span class="ic">${ring('live',24,4,'#fff')}</span>`;
+const moreSvg='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v2.6h-2.6"/></svg>';
+function la(m,k){const d=t();
+  if(m==='closed')return `<div class="la closed themed"><div class="la-h"><span>${d.until}</span></div><span class="num" style="line-height:46px">${d.closed}</span><p class="la-p">${d.closedSub}</p><div class="dl"><s style="width:100%"></s><u style="left:26.7%"></u><u style="left:66.7%"></u></div></div>`;
+  return `<div class="la themed ${m==='x'?'last':''}"><div class="la-h"><span>${d.until}, <b>${segOf(m)}</b></span><span class="la-more" role="img" aria-label="${d.more}" title="${d.more}">${moreSvg}</span></div>${num(k)}<p class="la-p">${P(m)}</p>${dline(k)}</div>`}
+const status=(time,live)=>`<div class="status"><span ${live?'data-clock':''}>${time}</span><span class="sig">5G <span class="batt"></span></span></div>`;
+function lock(o){const d=t();
+  return `<div class="scr lock ${o.night?'night':''}">${status(o.time,o.live)}${o.di||'<div class="pill"></div>'}
+  <div class="l-date">${o.inline||d.date}</div><div class="l-clock" ${o.live?'data-clock':''}>${o.time}</div>
+  ${o.wid||''}<div class="l-stack">${o.stack||''}</div>
+  <div class="l-bot"><span></span><span></span></div><div class="homebar"></div></div>`}
+const phone=(inner,cap,crop)=>`<figure><div class="phone ${crop?'crop':''}" ${crop?`style="height:${crop+10}px"`:''}>${inner}</div><figcaption>${cap}</figcaption></figure>`;
+const sec=(h,ps)=>`<section><h2>${h[0]}</h2><p>${h[1]}</p><div class="row">${ps.join('')}</div></section>`;
+function app(i,title,body,gear){const d=t();
+  return `<div class="scr app themed">${status('9:41')}<div class="pill"></div><div class="a-body"><div class="a-h"><h3>${title}</h3>${gear?'<span class="gear"></span>':''}</div>${body}</div>
+  <div class="tabs">${d.tab.map((x,j)=>`<span class="${j===i?'on':''}">${x}</span>`).join('')}</div><div class="homebar"></div></div>`}
+function ob(step,body,end){
+  const st=step?`<div class="steps">${[1,2,3,4,5].map(n=>`<i class="${n<=step?'on':''}"></i>`).join('')}</div>`:'';
+  return `<div class="scr app themed">${status('9:41')}<div class="pill"></div><div class="ob">${st}${body}<div class="end">${end}</div></div><div class="homebar"></div></div>`}
+const list=rows=>`<div class="list">${rows.map(r=>`<div><span>${r[0]}</span><em>${r[1]||'›'}</em></div>`).join('')}</div>`;
+
+/* ---------- render ---------- */
+function render(){const d=t();const LM=liveM(),LP=P(LM),LS=segOf(LM);document.documentElement.lang=S.lang;document.body.dataset.theme=S.theme;
+  document.title=d.ttl;ttl.textContent=d.ttl;lead.textContent=d.lead;foot.textContent=d.foot;
+  const btn=(g,v,l)=>`<button data-g="${g}" data-v="${v}" aria-pressed="${S[g]===v}">${l}</button>`;
+  bar.innerHTML=`<div class="grp"><span>${d.gLang}</span>${btn('lang','ru','RU')}${btn('lang','en','EN')}</div>
+   <div class="grp"><span>${d.gTheme}</span>${THEMES.map(x=>btn('theme',x[0],S.lang==='ru'?x[1]:x[2])).join('')}</div>
+   <div class="grp"><span>${d.gTone}</span>${TONES.map(x=>btn('tone',x,d.tone[x])).join('')}</div>`;
+  const nx=`<span class="cta">${d.next}</span><span class="skip">${d.skip}</span>`;
+  const widDay=`<div class="l-wid"><div class="wr"><div class="a"><b>${sys('live')}</b>${d.until.toLowerCase()}</div><div class="b">${P('m')}</div></div><div class="wc">${ring('live',76,2.6,'#fff')}${sys('live')}</div></div>`;
+  const widNight=`<div class="l-wid"><div class="wr"><div class="a"><b>${sys('w')}</b>${d.untilWake.toLowerCase()}</div><div class="b">${d.rest}</div></div><div class="wc" style="opacity:.6">${sys('w')}</div></div>`;
+  const diC=`<div class="pill compact">${ring('live',22,4.5,'var(--c-di)')}<span class="t">${sys('live')}</span></div>`;
+  const diM=`<div class="pill other"></div><div class="dot">${ring('live',22,4.5,'var(--c-di)')}</div>`;
+  const diX=`<div class="di-x"><div class="h"><span>${d.until}</span><span>${LS}</span></div>${num('live')}<p class="p">${LP}</p>${dline('live')}</div>`;
+  const thName=x=>S.lang==='ru'?x[1]:x[2];
+  const sw=`<div class="sw">${THEMES.map((x,i)=>`<div class="${S.theme===x[0]?'on':''}" style="--s:${SW[x[0]]}">${thName(x)}</div>`).join('')}</div>`;
+  const fmtChips=`<div class="chips">${d.fmtO.map((x,i)=>`<span class="${i?'':'on'}">${x}</span>`).join('')}<span>${d.dots}</span></div>`;
+  const lab=`<div class="dl-lab"><span style="width:26.7%">8:00</span><span style="width:40%">12:00</span><span style="flex:1">18:00</span><span>23:00</span></div>`;
+
+  main.innerHTML=[
+  sec(d.s1,[
+    phone(lock({time:'',live:1,stack:la(LM,'live')}),d.c1[0]),
+    phone(lock({time:'8:01',stack:la('m','m')}),d.c1[1]),
+    phone(lock({time:'14:33',stack:la('d','d')}),d.c1[2]),
+    phone(lock({time:'22:12',stack:la('x','l')}),d.c1[3]),
+    phone(lock({time:'23:00',night:1,stack:la('closed')}),d.c1[4])]),
+  sec(d.s2,[
+    phone(lock({time:'14:33',di:diC}),d.c2[0],230),
+    phone(lock({time:'14:33',di:diM}),d.c2[1],230),
+    phone(lock({time:'14:33',di:'<div class="pill"></div>'+diX}),d.c2[2],230)]),
+  sec(d.s3,[
+    phone(lock({time:'',live:1,inline:`${d.until} ${sys('live')}`,wid:widDay}),d.c3[0],330),
+    phone(lock({time:'1:18',night:1,inline:`${d.untilWake} ${sys('w')}`,wid:widNight}),d.c3[1],330)]),
+  sec(d.s4,[
+    phone(lock({time:'8:00',stack:`<div class="nt">${icon}<div><b>${d.ntT}</b><span>${P('m')}</span></div><em>${d.now}</em></div>`+la('m','m')}),d.c4[0])]),
+  sec(d.s5,[
+    phone(ob(0,`<div style="margin-top:90px">${num('live','hms','big')}</div><h3 style="margin-top:26px">${d.wH}</h3><p class="lead">${d.wP}</p>`,`<span class="cta">${d.wB}</span>`),d.c5[0]),
+    phone(ob(1,`<h3>${d.q1}</h3><div class="times"><div><span class="sub">${d.wake}</span><span class="num">8:00</span></div><div><span class="sub">${d.bed}</span><span class="num">23:00</span></div></div><p class="lead">${d.q1n}</p>`,nx),d.c5[1]),
+    phone(ob(2,`<h3>${d.q2}</h3><div class="opts">${d.q2o.map((x,i)=>`<div class="${i===2?'on':''}">${x}</div>`).join('')}</div>`,nx),d.c5[2]),
+    phone(ob(3,`<h3>${d.q3}</h3><div class="opts">${TONES.map(x=>`<div class="${S.tone===x?'on':''}">${d.tone[x]}<small>${d.ph[x].m}</small></div>`).join('')}</div>`,nx),d.c5[3]),
+    phone(ob(4,`<h3>${d.q4}</h3><div class="opts">${d.q4o.map((x,i)=>`<div class="${i===0?'on':''}">${x}</div>`).join('')}</div>`,nx),d.c5[4]),
+    phone(ob(5,`<h3>${d.q5}</h3><div class="opts">${d.q5o.map((x,i)=>`<div class="${i===2?'on':''}">${x[0]}<small>${x[1]}</small></div>`).join('')}</div>`,nx),d.c5[5]),
+    phone(ob(0,`<h3>${d.vH}</h3><p class="lead">${d.vP}</p><div class="mini" style="margin-top:18px">${la(LM,'live')}</div><p class="cap">${d.vTheme}</p>${sw}<p class="cap">${d.fmt}</p>${fmtChips}`,`<span class="cta">${d.next}</span>`),d.c5[6]),
+    phone(ob(0,`<div style="margin-top:60px" class="nt"><span class="ic">${ring('live',24,4,'#fff')}</span><div><b>${d.ntT}</b><span>${P('m')}</span></div></div><h3 style="margin-top:34px">${d.nH}</h3><p class="lead">${d.nP}</p>`,`<span class="cta">${d.nB}</span><span class="skip">${d.later}</span>`),d.c5[7]),
+    phone(ob(0,`<h3>${d.aH}</h3><p class="lead">${d.aP}</p><div style="margin:22px auto 0;padding:14px;border-radius:20px;background:#27365a"><div class="wr"><div class="a"><b>${sys('live')}</b>${d.until.toLowerCase()}</div><div class="b">${P('m')}</div></div></div><div class="how">${d.aS.map((x,i)=>`<div><b>${i+1}</b><span>${x}</span></div>`).join('')}</div>`,`<span class="cta">${d.aB}</span><span class="skip">${d.later}</span>`),d.c5[8]),
+    phone(ob(0,`<div style="margin-top:110px">${num('live','hms','big')}</div><h3 style="margin-top:26px">${d.gH}</h3><p class="lead">${d.gP}</p><div style="margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:16px;background:rgba(127,127,127,.16);font-size:15px;font-weight:600"><span>${d.auto}</span><span style="flex:none;width:46px;height:28px;border-radius:14px;background:var(--c-acc);position:relative"><i style="position:absolute;right:2px;top:2px;width:24px;height:24px;border-radius:50%;background:#fff"></i></span></div>`,`<span class="cta">${d.start}</span>`),d.c5[9])]),
+  sec(d.s6,[
+    phone(app(0,d.tab[0],`<span class="sub">${d.until}, ${LS.toLowerCase()}</span>${num('live','hms','big')}<p class="say">${LP}</p>${dline('live','tall')}${lab}<span class="cta ghost">${d.stop}</span>${list(d.st.map((r,i)=>i<2?r:[r[0],LM==='m'?d.seg.d+', 12:00':LM==='d'?d.seg.l+', 18:00':d.seg.m+', 8:00']))}`,1),d.c6[0]),
+    phone(app(1,d.tab[1],`<p class="cap" style="margin-top:0">${d.wTone}</p><div class="chips">${TONES.map(x=>`<span class="${S.tone===x?'on':''}">${d.tone[x]}</span>`).join('')}</div><p class="cap">${d.wMain}</p><div class="chips">${d.q2o.map((x,i)=>`<span class="${i===2?'on':''}">${x}</span>`).join('')}</div><p class="cap">${d.wCount}</p><div class="chips">${d.q5o.map((x,i)=>`<span class="${i===2?'on':''}">${x[0]}</span>`).join('')}</div><p class="cap">${d.wLast}</p>${list([[P('d'),d.hide],[P('m'),d.hide]])}${list([[d.own,'›']])}`),d.c6[1]),
+    phone(app(2,d.tab[2],`<div class="mini">${la(LM,'live')}</div><p class="cap">${d.vTheme}</p>${sw}<p class="cap">${d.fmt}</p>${fmtChips}${list([[d.vSound,d.vSoundV+' ›']])}`),d.c6[2]),
+    phone(app(3,d.tab[3],`<div class="times" style="margin-top:0"><div><span class="sub">${d.wake}</span><span class="num">8:00</span></div><div><span class="sub">${d.bed}</span><span class="num">23:00</span></div></div><p class="cap" style="margin-bottom:18px">${d.dSeg}. ${d.dSegN}</p>${dline('live','tall','<i style="left:26.7%"></i><i style="left:66.7%"></i>')}${lab}${list([[d.seg.m,'8:00–12:00'],[d.seg.d,'12:00–18:00'],[d.seg.l,'18:00–23:00']])}<div class="list"><div><span>${d.dOff}<br><span class="sub">${d.dOffN}</span></span><span class="tog"></span></div></div>`),d.c6[3]),
+    phone(app(-1,d.set,list(d.setO)),d.c6[4])]),
+  sec(d.s8,[
+    phone(`<div class="scr home">${status('9:41')}<div class="pill"></div><div class="h-grid">
+      <div class="hw s themed"><small>${d.until}</small>${num('live','hm')}<p>${LP}</p>${dline('live')}</div><div class="h-ic"><span></span><span></span><span></span><span></span></div>
+      <div class="hw m themed"><small>${d.until}, ${LS.toLowerCase()}</small>${num('live')}<p>${LP}</p>${dline('live')}</div></div></div>`,d.c8[0],470)])
+  ].join('');
+  tick();
+}
+bar.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[b.dataset.g]=b.dataset.v;render()});
+function fit(){document.documentElement.style.setProperty('--z',Math.min(1,(document.documentElement.clientWidth-32)/413).toFixed(3))}
+addEventListener('resize',fit);fit();render();setInterval(tick,1000);
+</script>
+</body>
+</html>

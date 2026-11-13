@@ -1,0 +1,279 @@
+# Builds the throwaway Live Activity spike (spike/) on a GitHub-hosted macOS runner and uploads it to TestFlight.
+# Signing: Xcode automatic signing driven only by the App Store Connect API key
+# (xcodebuild -allowProvisioningUpdates -authenticationKey*). No certificates are stored in secrets.
+# Required repository secrets: ASC_KEY_P8 (contents of the .p8), ASC_KEY_ID, ASC_ISSUER_ID.
+name: Spike to TestFlight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spike-testflight
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    name: Build spike and upload to TestFlight
+    # macos-26 = macOS 26 arm64 image (runner-images: macos-26-arm64-Readme.md, Xcode 26.0.1 … 26.6 installed).
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      XCODE_VERSION: "26.6"
+      XCODEGEN_VERSION: "2.46.0"
+      PROJECT_DIR: spike
+      SCHEME: TimeSpike
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: |
+          set -euo pipefail
+          XCODE_APP="/Applications/Xcode_${XCODE_VERSION}.app"
+          if [ ! -d "$XCODE_APP" ]; then
+            echo "::warning::$XCODE_APP is not on this image. Installed:"
+            ls -d /Applications/Xcode*.app
+            XCODE_APP="$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)"
+            echo "::warning::Falling back to $XCODE_APP"
+          fi
+          sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphoneos || true
+          sw_vers
+
+      - name: Install XcodeGen ${{ env.XCODEGEN_VERSION }}
+        run: |
+          set -euo pipefail
+          DEST="$RUNNER_TEMP/xcodegen"
+          mkdir -p "$DEST"
+          BIN=""
+          if curl -fsSL --retry 3 -o "$RUNNER_TEMP/xcodegen.zip" \
+               "https://github.com/yonaskolb/XcodeGen/releases/download/${XCODEGEN_VERSION}/xcodegen.zip" \
+             && unzip -q -o "$RUNNER_TEMP/xcodegen.zip" -d "$DEST"; then
+            BIN="$(find "$DEST" -type f -name xcodegen -perm -u+x | head -n 1 || true)"
+          fi
+          if [ -z "$BIN" ] || ! "$BIN" --version; then
+            echo "::warning::XcodeGen release zip unusable, installing from Homebrew"
+            brew install xcodegen
+            BIN="$(command -v xcodegen)"
+          fi
+          "$BIN" --version
+          echo "XCODEGEN=$BIN" >> "$GITHUB_ENV"
+
+      - name: Check committed assets and plists
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          for f in App/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png \
+                   Resources/Fonts/SpikeSegment.ttf \
+                   Resources/Sounds/quiet.wav \
+                   Resources/Sounds/silent.wav \
+                   Resources/Privacy/PrivacyInfo.xcprivacy; do
+            test -s "$f" || { echo "::error::missing asset $f"; exit 1; }
+          done
+          ICON=App/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png
+          sips -g pixelWidth -g pixelHeight -g hasAlpha "$ICON"
+          sips -g pixelWidth "$ICON" | grep -q "pixelWidth: 1024" || { echo "::error::icon is not 1024 px"; exit 1; }
+          sips -g hasAlpha "$ICON" | grep -q "hasAlpha: no" || { echo "::error::icon has an alpha channel"; exit 1; }
+          for p in Config/App-Info.plist Config/Widgets-Info.plist ExportOptions.plist Resources/Privacy/PrivacyInfo.xcprivacy; do
+            plutil -lint "$p"
+          done
+
+      - name: Generate Xcode project
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          "$XCODEGEN" generate --spec project.yml
+          xcodebuild -list -project TimeSpike.xcodeproj
+
+      - name: Install App Store Connect API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ASC_KEY_P8" ] || [ -z "$ASC_KEY_ID" ] || [ -z "$ASC_ISSUER_ID" ]; then
+            echo "::error::ASC_KEY_P8 / ASC_KEY_ID / ASC_ISSUER_ID secret is empty"
+            exit 1
+          fi
+          # ~/.appstoreconnect/private_keys is also where altool (fallback step) looks for AuthKey_<ID>.p8.
+          KEY_DIR="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$KEY_DIR"
+          KEY_PATH="$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY_PATH"
+          if ! grep -q "BEGIN PRIVATE KEY" "$KEY_PATH"; then
+            # Accept a base64-encoded secret as well.
+            if printf '%s' "$ASC_KEY_P8" | base64 -d > "$KEY_PATH.decoded" 2>/dev/null \
+               && grep -q "BEGIN PRIVATE KEY" "$KEY_PATH.decoded"; then
+              mv "$KEY_PATH.decoded" "$KEY_PATH"
+            else
+              echo "::error::ASC_KEY_P8 does not contain a PEM private key (-----BEGIN PRIVATE KEY-----)"
+              exit 1
+            fi
+          fi
+          chmod 600 "$KEY_PATH"
+          echo "ASC_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: Create temporary signing keychain
+        run: |
+          set -euo pipefail
+          KEYCHAIN_PATH="$RUNNER_TEMP/spike-signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          echo "::add-mask::$KEYCHAIN_PASSWORD"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          # First in the search list and default, so the Apple Development identity that xcodebuild
+          # creates through the API key during archive lands in an unlocked keychain.
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed -e 's/"//g')
+          security default-keychain -d user -s "$KEYCHAIN_PATH"
+          # Apple WWDR G3 intermediate, so codesign can build the certificate chain (non-fatal).
+          if curl -fsSL --retry 3 -o "$RUNNER_TEMP/AppleWWDRCAG3.cer" \
+               https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer; then
+            security import "$RUNNER_TEMP/AppleWWDRCAG3.cer" -k "$KEYCHAIN_PATH" || true
+          fi
+          security list-keychains -d user
+          echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
+
+      - name: Archive (build number = run number ${{ github.run_number }})
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set +e
+          set -u
+          mkdir -p "$RUNNER_TEMP/logs"
+          ARCHIVE_PATH="$RUNNER_TEMP/TimeSpike.xcarchive"
+          echo "ARCHIVE_PATH=$ARCHIVE_PATH" >> "$GITHUB_ENV"
+          LOG="$RUNNER_TEMP/logs/archive.log"
+          xcodebuild archive \
+            -project TimeSpike.xcodeproj \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$ARCHIVE_PATH" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | tee "$LOG" | grep --line-buffered -E "error:|warning: .*([Ss]ign|[Pp]rovision|[Cc]ertificate)|Signing Identity|Provisioning Profile|\*\* [A-Z ]+ \*\*"
+          STATUS=${PIPESTATUS[0]}
+          echo "xcodebuild archive exit code: $STATUS"
+          if [ "$STATUS" -ne 0 ]; then
+            echo "----- last 120 lines of archive.log -----"
+            tail -n 120 "$LOG"
+            exit "$STATUS"
+          fi
+          test -d "$ARCHIVE_PATH" || { echo "::error::archive not produced"; exit 1; }
+          /usr/libexec/PlistBuddy -c "Print :ApplicationProperties" "$ARCHIVE_PATH/Info.plist" || true
+
+      - name: Export and upload to TestFlight (xcodebuild, destination=upload)
+        id: upload
+        continue-on-error: true
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set +e
+          set -u
+          LOG="$RUNNER_TEMP/logs/export-upload.log"
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath "$RUNNER_TEMP/export-upload" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            2>&1 | tee "$LOG"
+          STATUS=${PIPESTATUS[0]}
+          echo "xcodebuild -exportArchive exit code: $STATUS"
+          if [ "$STATUS" -eq 0 ] && grep -q "EXPORT FAILED" "$LOG"; then
+            STATUS=1
+          fi
+          exit "$STATUS"
+
+      # Only if the direct upload failed: export a local .ipa and upload it with altool + the same API key.
+      - name: Fallback - export IPA and upload with altool
+        if: steps.upload.outcome == 'failure'
+        working-directory: ${{ env.PROJECT_DIR }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set +e
+          set -u
+          echo "::warning::destination=upload failed, trying export + altool"
+          OPTS="$RUNNER_TEMP/ExportOptions-ipa.plist"
+          cp ExportOptions.plist "$OPTS"
+          /usr/libexec/PlistBuddy -c "Set :destination export" "$OPTS"
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportOptionsPlist "$OPTS" \
+            -exportPath "$RUNNER_TEMP/export-ipa" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            2>&1 | tee "$RUNNER_TEMP/logs/export-ipa.log"
+          STATUS=${PIPESTATUS[0]}
+          if [ "$STATUS" -ne 0 ]; then
+            echo "::error::export to IPA failed too (signing problem, see logs artifact)"
+            exit "$STATUS"
+          fi
+          IPA="$(ls "$RUNNER_TEMP"/export-ipa/*.ipa 2>/dev/null | head -n 1)"
+          if [ -z "$IPA" ]; then
+            echo "::error::no .ipa in $RUNNER_TEMP/export-ipa"
+            exit 1
+          fi
+          xcrun altool --upload-app -f "$IPA" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" \
+            2>&1 | tee "$RUNNER_TEMP/logs/altool.log"
+          exit "${PIPESTATUS[0]}"
+
+      - name: Collect Xcode distribution logs
+        if: always()
+        run: |
+          set +e
+          mkdir -p "$RUNNER_TEMP/logs/distribution"
+          find "${TMPDIR:-/tmp}" -maxdepth 3 -name "*.xcdistributionlogs" -type d 2>/dev/null \
+            | while read -r d; do cp -R "$d" "$RUNNER_TEMP/logs/distribution/"; done
+          cp "$PROJECT_DIR/project.yml" "$RUNNER_TEMP/logs/" 2>/dev/null
+          exit 0
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: spike-logs-${{ github.run_number }}
+          path: ${{ runner.temp }}/logs
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Summary
+        if: success()
+        run: |
+          {
+            echo "### Spike uploaded to App Store Connect"
+            echo "- Version 0.1.0, build **${GITHUB_RUN_NUMBER}**"
+            echo "- $(xcodebuild -version | head -n 1)"
+            echo "- Direct upload step: ${{ steps.upload.outcome }} (if failure, the altool fallback uploaded it)"
+            echo "- Processing in App Store Connect usually takes 5-30 min, then the build appears in TestFlight."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove keychain and API key
+        if: always()
+        run: |
+          set +e
+          [ -n "${KEYCHAIN_PATH:-}" ] && security delete-keychain "$KEYCHAIN_PATH"
+          [ -n "${ASC_KEY_PATH:-}" ] && rm -f "$ASC_KEY_PATH"
+          exit 0
